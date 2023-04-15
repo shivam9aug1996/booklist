@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addBookToFireStore, updateBookToFireStore } from "./BookSlice";
 
@@ -9,6 +9,7 @@ const BookForm = ({ edit, setEdit }) => {
   );
   const dispatch = useDispatch();
   const [bookInput, setBookInput] = useState("");
+  const bookInputRef = useRef(null);
 
   useEffect(() => {
     if (edit) setBookInput(edit?.book?.name);
@@ -21,6 +22,7 @@ const BookForm = ({ edit, setEdit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    bookInputRef?.current?.blur();
     if (bookInput) {
       let book = {
         name: bookInput,
@@ -36,38 +38,94 @@ const BookForm = ({ edit, setEdit }) => {
     }
   };
   return (
-    <>
+    <div
+      style={{
+        borderWidth: 3,
+        padding: 20,
+        borderStyle: "solid",
+        borderRadius: 20,
+        borderColor: "black",
+        marginBottom: 20,
+      }}
+    >
       <form onSubmit={(e) => handleSubmit(e)}>
-        <label>
-          Book name:{" "}
-          <input
-            name="bookInput"
-            value={bookInput}
-            onChange={(e) => setBookInput(e.target.value)}
-          />
-        </label>
-        {edit ? (
-          <>
-            <button disabled={updatingBookLoader} type="update">
-              Update
-            </button>
-            <button
-              onClick={() => {
-                setEdit(null);
-                setBookInput("");
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <label>
+            Book name:{" "}
+            <input
+              name="bookInput"
+              value={bookInput}
+              onChange={(e) => setBookInput(e.target.value)}
+              ref={bookInputRef}
+            />
+          </label>
+          {edit ? (
+            <div
+              style={{
+                justifyContent: "space-between",
+                marginTop: 10,
+                //backgroundColor: "red",
+                minWidth: 120,
+                alignItems: "center",
+                display: "flex",
               }}
-              type="cancel"
             >
-              Cancel
+              <button
+                style={{
+                  backgroundColor: "white",
+                  borderWidth: 2,
+                  borderRadius: 5,
+                  padding: 5,
+                  maxWidth: 70,
+                }}
+                disabled={updatingBookLoader}
+                type="update"
+              >
+                Update
+              </button>
+              <button
+                style={{
+                  backgroundColor: "white",
+                  borderWidth: 2,
+                  borderRadius: 5,
+                  padding: 5,
+                  maxWidth: 70,
+                }}
+                onClick={() => {
+                  setEdit(null);
+                  setBookInput("");
+                }}
+                type="cancel"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              style={{
+                backgroundColor: "white",
+                borderWidth: 2,
+                borderRadius: 5,
+                padding: 5,
+                maxWidth: 70,
+                marginTop: 10,
+              }}
+              disabled={addingBookLoader}
+              type="submit"
+            >
+              Add
             </button>
-          </>
-        ) : (
-          <button disabled={addingBookLoader} type="submit">
-            Add
-          </button>
-        )}
+          )}
+        </div>
       </form>
-    </>
+    </div>
   );
 };
 
